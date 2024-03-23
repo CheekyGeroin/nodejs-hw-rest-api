@@ -6,14 +6,15 @@ const gravatar = require("gravatar");
 const path = require("path");
 const fs = require("fs/promises");
 const Jimp = require("jimp");
+const { v4 } = require("uuid");
 
 const { SECRET_KEY } = process.env;
 
 const avatarsDir = path.join(__dirname, "../", "../", "public", "avatars");
-console.log(avatarsDir);
 
 const register = async (req, res) => {
   const { email, password } = req.body;
+  console.log(email, password);
   const user = await User.findOne({ email });
 
   if (user) {
@@ -22,12 +23,22 @@ const register = async (req, res) => {
 
   const hashPassword = await bcrypt.hash(password, 10);
   const avatarURL = gravatar.url(email);
+  const verificationToken = v4();
 
   const newUser = await User.create({
     ...req.body,
     password: hashPassword,
     avatarURL,
+    verificationToken,
   });
+
+  // const verifyEmail = {
+  //   to: email,
+  //   subject: "Verify email",
+  //   html: `<a targer="_blank" href="${BASE_URL}/users/verify/${verificationToken}">Click verify email</a>`,
+  // };
+
+  // await sendEmail(verifyEmail);
 
   res.status(201).json({
     user: {
