@@ -8,6 +8,10 @@ const { auth } = require("../../controllers");
 
 router.post("/register", validation(loginSchema), auth.register);
 
+router.get("/verify/:verificationToken", auth.verifyEmail);
+
+router.post("/verify", auth.reVerification);
+
 router.post("/login", validation(loginSchema), auth.login);
 
 router.get("/current", authenticate, auth.current);
